@@ -32,10 +32,10 @@ public class AuthenticationService {
 //                    String encryptedPassword = rs.getString("PASSWORD");
 //
 //                    // Decrypt the password using the old key
-//                    String decryptedPassword = Security.decrypt(encryptedPassword, servletContext);
+//                    String decryptedPassword = Security.decrypt(decryptedPassword, servletContext);
 //
 //                    // Encrypt the password using the new key
-//                    String newEncryptedPassword = Security.encrypt(decryptedPassword, servletContext);
+//                    String newEncryptedPassword = Security.encrypt(encryptedPassword, servletContext);
 //
 //                    // Update the encrypted password in the database
 //                    updatePs.setString(1, newEncryptedPassword);
@@ -48,6 +48,7 @@ public class AuthenticationService {
 //            throw new RuntimeException("Failed to update encrypted passwords", e);
 //        }
 //    }
+    
     private void loadUserData(ServletContext servletContext) {
         try (Connection con = DriverManager.getConnection(url, dbUsername, dbPassword)) {
             String query = "SELECT * FROM USER_INFO ORDER BY username";
