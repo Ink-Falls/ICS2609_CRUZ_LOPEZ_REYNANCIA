@@ -19,6 +19,36 @@ public class AuthenticationService {
         loadUserData(servletContext);
     }
 
+// Use for changing keys
+//    public void updateEncryptedPasswords(ServletContext servletContext) {
+//        try (Connection con = DriverManager.getConnection(url, dbUsername, dbPassword)) {
+//            String selectQuery = "SELECT * FROM USER_INFO";
+//            String updateQuery = "UPDATE USER_INFO SET PASSWORD = ? WHERE USERNAME = ?";
+//
+//            try (PreparedStatement selectPs = con.prepareStatement(selectQuery); ResultSet rs = selectPs.executeQuery(); PreparedStatement updatePs = con.prepareStatement(updateQuery)) {
+//
+//                while (rs.next()) {
+//                    String username = rs.getString("USERNAME");
+//                    String encryptedPassword = rs.getString("PASSWORD");
+//
+//                    // Decrypt the password using the old key
+//                    String decryptedPassword = Security.decrypt(encryptedPassword, servletContext);
+//
+//                    // Encrypt the password using the new key
+//                    String newEncryptedPassword = Security.encrypt(decryptedPassword, servletContext);
+//
+//                    // Update the encrypted password in the database
+//                    updatePs.setString(1, newEncryptedPassword);
+//                    updatePs.setString(2, username);
+//                    updatePs.executeUpdate();
+//                }
+//            }
+//        } catch (SQLException e) {
+//            // Log the exception or perform any necessary error handling
+//            throw new RuntimeException("Failed to update encrypted passwords", e);
+//        }
+//    }
+
     private void loadUserData(ServletContext servletContext) {
         try (Connection con = DriverManager.getConnection(url, dbUsername, dbPassword)) {
             String query = "SELECT * FROM USER_INFO ORDER BY username";
