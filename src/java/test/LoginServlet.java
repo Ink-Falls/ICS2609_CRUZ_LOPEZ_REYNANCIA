@@ -53,14 +53,21 @@ public class LoginServlet extends HttpServlet {
         } catch (AuthenticationService.AuthenticationException e) {
             switch (e.getMessage()) {
                 case "Invalid username":
-                    if (password != null) {
-                        response.sendRedirect("error_3.jsp");
-                    } else {
+                    if (password == null || password.isEmpty()) {
                         response.sendRedirect("error_1.jsp");
+                    } else {
+                        response.sendRedirect("error_3.jsp");
                     }
                     break;
                 case "Invalid password":
                     response.sendRedirect("error_2.jsp");
+                    break;
+                case "Invalid username and password":
+                    if (username != null && password != null || !username.isEmpty() && !password.isEmpty()) {
+                        response.sendRedirect("error_3.jsp");
+                    } else {
+                        response.sendRedirect("error_4.jsp");
+                    }
                     break;
                 default:
                     response.sendRedirect("error_4.jsp");

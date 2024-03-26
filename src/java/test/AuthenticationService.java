@@ -48,7 +48,6 @@ public class AuthenticationService {
 //            throw new RuntimeException("Failed to update encrypted passwords", e);
 //        }
 //    }
-
     private void loadUserData(ServletContext servletContext) {
         try (Connection con = DriverManager.getConnection(url, dbUsername, dbPassword)) {
             String query = "SELECT * FROM USER_INFO ORDER BY username";
@@ -108,7 +107,11 @@ public class AuthenticationService {
             }
 
             if (!isUsernameValid(username)) {
-                throw new AuthenticationException("Invalid username");
+                if (password == null || password.isEmpty()) {
+                    throw new AuthenticationException("Invalid username");
+                } else {
+                    throw new AuthenticationException("Invalid username and password");
+                }
             } else if (!isPasswordValid(username, password)) {
                 throw new AuthenticationException("Invalid password");
             } else {
