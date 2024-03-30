@@ -48,7 +48,6 @@ public class AuthenticationService {
 //            throw new RuntimeException("Failed to update encrypted passwords", e);
 //        }
 //    }
-    
     private void loadUserData(ServletContext servletContext) {
         try (Connection con = DriverManager.getConnection(url, dbUsername, dbPassword)) {
             String query = "SELECT * FROM USER_INFO ORDER BY username";

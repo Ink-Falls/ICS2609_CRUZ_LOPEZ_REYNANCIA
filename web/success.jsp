@@ -51,7 +51,7 @@
             <script>
                 function logout() {
                     // Call the logout servlet
-                    window.location.href = 'LogoutServlet';
+                    window.location.replace('LogoutServlet');
                 }
             </script>
 

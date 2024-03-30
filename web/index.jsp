@@ -13,7 +13,7 @@
             response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
             response.setDateHeader("Expires", 0); // Proxies.
             
-            if (session != null || session.getAttribute("username") != null) {
+            if (session != null && session.getAttribute("username") != null) {
                 session.invalidate();
             }
         %>
