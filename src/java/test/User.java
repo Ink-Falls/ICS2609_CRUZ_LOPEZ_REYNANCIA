@@ -1,29 +1,56 @@
 package test;
 
-public class User {
+import javax.servlet.ServletContext;
+
+class User {
 
     private final String username;
-    private final String password;
-    private final String role;
+    private final Role role;
+    private final String storedEncryptedPassword;
 
     // Constructor
-    public User(String username, String password, String role) {
+    public User(String username, Role role, String storedEncryptedPassword) {
+        if (username == null) {
+            throw new IllegalArgumentException("Username cannot be null");
+        }
         this.username = username;
-        this.password = password;
+        if (role == null) {
+            throw new IllegalArgumentException("Role cannot be null");
+        }
         this.role = role;
+        if (storedEncryptedPassword == null) {
+            throw new IllegalArgumentException("Stored encrypted password cannot be null");
+        }
+        this.storedEncryptedPassword = storedEncryptedPassword;
     }
 
-    // Getters and setters
+    // Getters
     public String getUsername() {
         return username;
     }
 
-    public String getPassword() {
-        return password;
+    // Removed the getter for storedEncryptedPassword
+
+    public boolean verifyPassword(String inputPassword, ServletContext servletContext) {
+        if (inputPassword == null) {
+            return false;
+        }
+        String encryptionKey = servletContext.getInitParameter("ENCRYPTION_KEY");
+        try {
+            String decryptedStoredPassword = decryptStoredPassword(encryptionKey);
+            return decryptedStoredPassword.equals(inputPassword);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
+}
+
+enum Role {
+    Admin,
+    Guest
 }

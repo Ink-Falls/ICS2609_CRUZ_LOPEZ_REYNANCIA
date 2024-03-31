@@ -1,7 +1,11 @@
 package test;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.security.*;
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.ServletContext;
 import org.apache.commons.codec.binary.*;
@@ -29,7 +33,7 @@ public class Security {
         return encryptedString;
     }
 
-    public static String decrypt(String codeDecrypt, ServletContext servletContext) {
+    public static String decrypt(String codeDecrypt, ServletContext servletContext) throws Exception {
         String decryptedString = null;
         try {
             if (encryptionKey == null || cipherAlgorithm == null) {
@@ -40,8 +44,8 @@ public class Security {
             Cipher cipher = getCipherInstance(cipherAlgorithm);
             final SecretKeySpec secretKey = getSecretKey(encryptionKey);
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
-            decryptedString = new String(cipher.doFinal(Base64.decodeBase64(codeDecrypt)), StandardCharsets.UTF_8);
-        } catch (Exception e) {
+            decryptedString = new String(cipher.doFinal(Base64.decodeBase64(codeDecrypt)), StandardCharsets.UTF_8).trim();
+        } catch (NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
             System.err.println(e.getMessage());
         }
         return decryptedString;

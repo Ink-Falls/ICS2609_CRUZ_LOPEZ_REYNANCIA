@@ -1,0 +1,7 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "build\\web\\WEB-INF\\lib\\commons-codec-1.9.jar",
+        "c:\\Users\\johnl\\GlassFish_Server\\glassfish\\modules\\javax.servlet-api.jar"
+    ]
+}

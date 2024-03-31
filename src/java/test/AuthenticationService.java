@@ -2,12 +2,14 @@ package test;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import javax.servlet.ServletContext;
 
 public class AuthenticationService {
 
-    private static final List<User> users = new ArrayList<>();
+    private static final Map<String, User> users = new HashMap<>();
     private final String url;
     private final String dbUsername;
     private final String dbPassword;
@@ -19,35 +21,6 @@ public class AuthenticationService {
         loadUserData(servletContext);
     }
 
-// Use for changing keys
-//    public void updateEncryptedPasswords(ServletContext servletContext) {
-//        try (Connection con = DriverManager.getConnection(url, dbUsername, dbPassword)) {
-//            String selectQuery = "SELECT * FROM USER_INFO";
-//            String updateQuery = "UPDATE USER_INFO SET PASSWORD = ? WHERE USERNAME = ?";
-//
-//            try (PreparedStatement selectPs = con.prepareStatement(selectQuery); ResultSet rs = selectPs.executeQuery(); PreparedStatement updatePs = con.prepareStatement(updateQuery)) {
-//
-//                while (rs.next()) {
-//                    String username = rs.getString("USERNAME");
-//                    String encryptedPassword = rs.getString("PASSWORD");
-//
-//                    // Decrypt the password using the old key
-//                    String decryptedPassword = Security.decrypt(decryptedPassword, servletContext);
-//
-//                    // Encrypt the password using the new key
-//                    String newEncryptedPassword = Security.encrypt(encryptedPassword, servletContext);
-//
-//                    // Update the encrypted password in the database
-//                    updatePs.setString(1, newEncryptedPassword);
-//                    updatePs.setString(2, username);
-//                    updatePs.executeUpdate();
-//                }
-//            }
-//        } catch (SQLException e) {
-//            // Log the exception or perform any necessary error handling
-//            throw new RuntimeException("Failed to update encrypted passwords", e);
-//        }
-//    }
     private void loadUserData(ServletContext servletContext) {
         try (Connection con = DriverManager.getConnection(url, dbUsername, dbPassword)) {
             String query = "SELECT * FROM USER_INFO ORDER BY username";
@@ -57,7 +30,7 @@ public class AuthenticationService {
                 while (rs.next()) {
                     String username = null;
                     String encryptedPassword = null;
-                    String role = null;
+                    Role role = null;
 
                     // Handle potential null values
                     if (rs.getString("USERNAME") != null) {
@@ -70,15 +43,9 @@ public class AuthenticationService {
                         role = rs.getString("ROLE").trim();
                     }
 
-                    // Decrypt the password
-                    String decryptedPassword = null;
-                    if (encryptedPassword != null) {
-                        decryptedPassword = Security.decrypt(encryptedPassword, servletContext);
-                    }
-
                     // Create a User object only if username and role are not null
                     if (username != null && role != null) {
-                        users.add(new User(username, decryptedPassword, role));
+                        users.put(username, new User(username, role, encryptedPassword));
                     } else {
                         // Log or handle the case when username or role is null
                         System.out.println("Skipping user record with null username or role");
@@ -94,24 +61,32 @@ public class AuthenticationService {
         }
     }
 
+    private boolean isUsernameValid(String username) {
+        return users.containsKey(username);
+    }
+
+    private boolean isPasswordValid(String username, String password) {
+        User user = users.get(username);
+        return user != null && user.verifyPassword(password);
+    }
+
     public User authenticate(String username, String password) throws NullValueException, AuthenticationException {
         try {
-            if (username == null && password == null || username.isEmpty() && password.isEmpty()) {
-                throw new NullValueException("Username and password cannot be empty");
+            if (username == null || username.isEmpty()) {
+                throw new NullValueException("Username cannot be empty");
             }
 
-            for (User user : users) {
-                if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
-                    return user;
-                }
+            if (password == null || password.isEmpty()) {
+                throw new NullValueException("Password cannot be empty");
+            }
+
+            User user = users.get(username);
+            if (user != null && user.verifyPassword(password)) {
+                return user;
             }
 
             if (!isUsernameValid(username)) {
-                if (password == null || password.isEmpty()) {
-                    throw new AuthenticationException("Invalid username");
-                } else {
-                    throw new AuthenticationException("Invalid username and password");
-                }
+                throw new AuthenticationException("Invalid username");
             } else if (!isPasswordValid(username, password)) {
                 throw new AuthenticationException("Invalid password");
             } else {
@@ -121,16 +96,6 @@ public class AuthenticationService {
             // Log the exception or perform any necessary error handling
             throw new AuthenticationException("An error occurred during authentication", e);
         }
-    }
-
-    private boolean isUsernameValid(String username) {
-        return users.stream().anyMatch(user -> user.getUsername().equals(username));
-    }
-
-    private boolean isPasswordValid(String username, String password) {
-        return users.stream()
-                .filter(user -> user.getUsername().equals(username))
-                .anyMatch(user -> user.getPassword().equals(password));
     }
 
     public static class AuthenticationException extends Exception {
