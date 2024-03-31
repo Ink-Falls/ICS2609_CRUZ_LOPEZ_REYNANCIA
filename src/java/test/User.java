@@ -1,15 +1,13 @@
 package test;
 
-import javax.servlet.ServletContext;
-
 class User {
 
     private final String username;
     private final Role role;
-    private final String storedEncryptedPassword;
+    private final String password;
 
     // Constructor
-    public User(String username, Role role, String storedEncryptedPassword) {
+    public User(String username, Role role, String password) {
         if (username == null) {
             throw new IllegalArgumentException("Username cannot be null");
         }
@@ -18,10 +16,10 @@ class User {
             throw new IllegalArgumentException("Role cannot be null");
         }
         this.role = role;
-        if (storedEncryptedPassword == null) {
+        if (password == null) {
             throw new IllegalArgumentException("Stored encrypted password cannot be null");
         }
-        this.storedEncryptedPassword = storedEncryptedPassword;
+        this.password = password;
     }
 
     // Getters
@@ -29,21 +27,11 @@ class User {
         return username;
     }
 
-    // Removed the getter for storedEncryptedPassword
+    // Removed the getter for password
 
-    public boolean verifyPassword(String inputPassword, ServletContext servletContext) {
-        if (inputPassword == null) {
-            return false;
-        }
-        String encryptionKey = servletContext.getInitParameter("ENCRYPTION_KEY");
-        try {
-            String decryptedStoredPassword = decryptStoredPassword(encryptionKey);
-            return decryptedStoredPassword.equals(inputPassword);
-        } catch (Exception e) {
-            return false;
-        }
+    public boolean verifyPassword(String inputPassword) {
+        return password.equals(inputPassword);
     }
-
     public Role getRole() {
         return role;
     }

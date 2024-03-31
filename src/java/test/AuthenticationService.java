@@ -1,10 +1,8 @@
 package test;
 
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.List;
 import javax.servlet.ServletContext;
 
 public class AuthenticationService {
@@ -40,7 +38,10 @@ public class AuthenticationService {
                         encryptedPassword = rs.getString("PASSWORD").trim();
                     }
                     if (rs.getString("ROLE") != null) {
-                        role = rs.getString("ROLE").trim();
+                        String roleString = rs.getString("ROLE").trim();
+                        if (roleString != null) {
+                            role = Role.valueOf(roleString);
+                        }
                     }
 
                     // Create a User object only if username and role are not null
