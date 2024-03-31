@@ -3,14 +3,14 @@ package test;
 class User {
 
     private String username;
-    private Role role;
+    private String role;
     private String password;
 
     // Constructor
-    public User(String username, Role role, String password) {
+    public User(String username, String role, String password) {
         this.username = username;
         this.role = role;
-        setPassword(password);
+        this.password = password;
     }
 
     // Getters and setters
@@ -18,16 +18,12 @@ class User {
         return username;
     }
 
-    public Role getRole() {
+    public String getRole() {
         return role;
     }
 
     public String getPassword() {
         return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = Security.encrypt(password, null);
     }
 }
 

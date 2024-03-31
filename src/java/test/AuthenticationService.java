@@ -10,14 +10,50 @@ public class AuthenticationService {
     private final String url;
     private final String dbUsername;
     private final String dbPassword;
+    private Map<String, User> users;
+    private ServletContext servletContext;
 
     public AuthenticationService(String url, String dbUsername, String dbPassword, ServletContext servletContext) {
         this.url = url;
         this.dbUsername = dbUsername;
         this.dbPassword = dbPassword;
+        this.servletContext = servletContext;
     }
 
-    private Map<String, User> loadUserData() {
+    private boolean isPasswordValid(String username, String password) {
+        User user = users.get(username);
+        return user != null && user.getPassword().equals(password);
+    }
+
+    public User authenticate(String username, String password) throws NullValueException, AuthenticationException {
+        if (username == null || password == null || username.isEmpty() || password.isEmpty()) {
+            throw new NullValueException("Username and password must not be null");
+        }
+
+        try {
+            if (users == null) {
+                users = loadUserData();
+            }
+
+            if (!isUsernameValid(username)) {
+                if (!isPasswordValid(username, password)) {
+                    throw new AuthenticationException("Invalid username and password");
+                }
+                throw new AuthenticationException("Invalid username");
+            }
+
+            if (isPasswordValid(username, password)) {
+                return users.get(username);
+            } else {
+                throw new AuthenticationException("Invalid password");
+            }
+        } catch (NullPointerException e) {
+            // Log the exception or perform any necessary error handling
+            throw new AuthenticationException("An error occurred during authentication", e);
+        }
+    }
+
+    public Map<String, User> loadUserData() {
         Map<String, User> users = new HashMap<>();
         try (Connection con = DriverManager.getConnection(url, dbUsername, dbPassword)) {
             String query = "SELECT * FROM USER_INFO ORDER BY username";
@@ -27,76 +63,53 @@ public class AuthenticationService {
                 while (rs.next()) {
                     String username = null;
                     String encryptedPassword = null;
-                    Role role = null;
+                    String role = null;
 
                     // Handle potential null values
-                    if (rs.getString("USERNAME") != null) {
-                        username = rs.getString("USERNAME").trim();
+                    String usernameValue = rs.getString("USERNAME");
+                    if (usernameValue != null) {
+                        username = usernameValue.trim();
                     }
-                    if (rs.getString("PASSWORD") != null) {
-                        encryptedPassword = rs.getString("PASSWORD").trim();
+                    String passwordValue = rs.getString("PASSWORD");
+                    if (passwordValue != null) {
+                        encryptedPassword = passwordValue.trim();
                     }
-                    if (rs.getString("ROLE") != null) {
-                        String roleString = rs.getString("ROLE").trim();
-                        if (roleString != null) {
-                            role = Role.valueOf(roleString);
+                    String roleValue = rs.getString("ROLE");
+                    if (roleValue != null) {
+                        role = roleValue.trim();
+                    }
+
+                    String decryptedPassword = null;
+                    if (encryptedPassword != null) {
+                        try {
+                            ServletContext servletContext = this.servletContext;
+                            decryptedPassword = Security.decrypt(encryptedPassword, servletContext);
+                        } catch (Exception e) {
+                            System.out.println("Failed to decrypt password: " + e.getMessage());
                         }
                     }
 
                     // Create a User object only if username and role are not null
                     if (username != null && role != null) {
-                        users.put(username, new User(username, role, encryptedPassword));
+                        users.put(username, new User(username, role, decryptedPassword));
                     } else {
                         // Log or handle the case when username or role is null
                         System.out.println("Skipping user record with null username or role");
                     }
                 }
             }
-        } catch (SQLException e) {
-            // Log the exception or perform any necessary error handling
-            System.out.println("Failed to load user data: " + e.getMessage());
         } catch (NullPointerException e) {
             // Log the exception or perform any necessary error handling
             System.out.println("NullPointerException occurred while loading user data: " + e.getMessage());
+        } catch (SQLException e) {
+            // Log the exception or perform any necessary error handling
+            System.out.println("Failed to load user data: " + e.getMessage());
         }
         return users;
     }
 
-    private boolean isUsernameValid(String username, Map<String, User> users) {
+    private boolean isUsernameValid(String username) {
         return users.containsKey(username);
-    }
-
-    private boolean isPasswordValid(String username, String password, Map<String, User> users) {
-        return users.values().stream()
-                .filter(user -> user.getUsername().equals(username))
-                .anyMatch(user -> user.getPassword().equals(password));
-    }
-
-    public User authenticate(String username, String password) throws NullValueException, AuthenticationException {
-        try {
-            if (username == null || username.isEmpty()) {
-                throw new NullValueException("Username cannot be empty");
-            }
-
-            Map<String, User> users = loadUserData();
-
-            if (!isUsernameValid(username, users)) {
-                throw new AuthenticationException("Invalid username");
-            }
-
-            if (password == null || password.isEmpty()) {
-                throw new NullValueException("Password cannot be empty");
-            }
-
-            if (isPasswordValid(username, password, users)) {
-                return users.get(username);
-            } else {
-                throw new AuthenticationException("Invalid password");
-            }
-        } catch (NullPointerException e) {
-            // Log the exception or perform any necessary error handling
-            throw new AuthenticationException("An error occurred during authentication", e);
-        }
     }
 
     public static class AuthenticationException extends Exception {
