@@ -15,6 +15,10 @@ public class LoginServlet extends HttpServlet {
 
     private AuthenticationService authenticationService;
 
+    private static final String ERROR_INVALID_USERNAME = "Invalid username";
+    private static final String ERROR_INVALID_PASSWORD = "Invalid password";
+    private static final String ERROR_INVALID_USERNAME_PASSWORD = "Invalid username and password";
+
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
@@ -53,17 +57,17 @@ public class LoginServlet extends HttpServlet {
             }
         } catch (AuthenticationService.AuthenticationException e) {
             switch (e.getMessage()) {
-                case "Invalid username":
+                case ERROR_INVALID_USERNAME:
                     if (password == null || password.isEmpty()) {
                         response.sendRedirect("error_1.jsp");
                     } else {
                         response.sendRedirect("error_3.jsp");
                     }
                     break;
-                case "Invalid password":
+                case ERROR_INVALID_PASSWORD:
                     response.sendRedirect("error_2.jsp");
                     break;
-                case "Invalid username and password":
+                case ERROR_INVALID_USERNAME_PASSWORD:
                     if (username != null && password != null || !username.isEmpty() && !password.isEmpty()) {
                         response.sendRedirect("error_3.jsp");
                     } else {

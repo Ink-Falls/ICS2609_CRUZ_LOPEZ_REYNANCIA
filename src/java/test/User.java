@@ -2,40 +2,33 @@ package test;
 
 class User {
 
-    private final String username;
-    private final Role role;
-    private final String password;
+    private String username;
+    private Role role;
+    private String password;
 
     // Constructor
     public User(String username, Role role, String password) {
-        if (username == null) {
-            throw new IllegalArgumentException("Username cannot be null");
-        }
         this.username = username;
-        if (role == null) {
-            throw new IllegalArgumentException("Role cannot be null");
-        }
         this.role = role;
-        if (password == null) {
-            throw new IllegalArgumentException("Stored encrypted password cannot be null");
-        }
-        this.password = password;
+        setPassword(password);
     }
 
-    // Getters
+    // Getters and setters
     public String getUsername() {
         return username;
     }
 
-    // Removed the getter for password
-
-    public boolean verifyPassword(String inputPassword) {
-        return password.equals(inputPassword);
-    }
     public Role getRole() {
         return role;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = Security.encrypt(password, null);
+    }
 }
 
 enum Role {

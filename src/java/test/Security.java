@@ -14,8 +14,9 @@ public class Security {
 
     private static String encryptionKey;
     private static String cipherAlgorithm;
+    private static ServletContext servletContext;
 
-    public static String encrypt(String strToEncrypt, ServletContext servletContext) {
+    public static String encrypt(String strToEncrypt, String key) {
         String encryptedString = null;
         try {
             if (encryptionKey == null || cipherAlgorithm == null) {

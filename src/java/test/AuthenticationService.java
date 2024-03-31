@@ -7,7 +7,6 @@ import javax.servlet.ServletContext;
 
 public class AuthenticationService {
 
-    private static final Map<String, User> users = new HashMap<>();
     private final String url;
     private final String dbUsername;
     private final String dbPassword;
@@ -16,10 +15,10 @@ public class AuthenticationService {
         this.url = url;
         this.dbUsername = dbUsername;
         this.dbPassword = dbPassword;
-        loadUserData(servletContext);
     }
 
-    private void loadUserData(ServletContext servletContext) {
+    private Map<String, User> loadUserData() {
+        Map<String, User> users = new HashMap<>();
         try (Connection con = DriverManager.getConnection(url, dbUsername, dbPassword)) {
             String query = "SELECT * FROM USER_INFO ORDER BY username";
 
@@ -55,20 +54,22 @@ public class AuthenticationService {
             }
         } catch (SQLException e) {
             // Log the exception or perform any necessary error handling
-            throw new RuntimeException("Failed to load user data", e);
+            System.out.println("Failed to load user data: " + e.getMessage());
         } catch (NullPointerException e) {
             // Log the exception or perform any necessary error handling
-            throw new RuntimeException("NullPointerException occurred while loading user data", e);
+            System.out.println("NullPointerException occurred while loading user data: " + e.getMessage());
         }
+        return users;
     }
 
-    private boolean isUsernameValid(String username) {
+    private boolean isUsernameValid(String username, Map<String, User> users) {
         return users.containsKey(username);
     }
 
-    private boolean isPasswordValid(String username, String password) {
-        User user = users.get(username);
-        return user != null && user.verifyPassword(password);
+    private boolean isPasswordValid(String username, String password, Map<String, User> users) {
+        return users.values().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .anyMatch(user -> user.getPassword().equals(password));
     }
 
     public User authenticate(String username, String password) throws NullValueException, AuthenticationException {
@@ -77,21 +78,20 @@ public class AuthenticationService {
                 throw new NullValueException("Username cannot be empty");
             }
 
+            Map<String, User> users = loadUserData();
+
+            if (!isUsernameValid(username, users)) {
+                throw new AuthenticationException("Invalid username");
+            }
+
             if (password == null || password.isEmpty()) {
                 throw new NullValueException("Password cannot be empty");
             }
 
-            User user = users.get(username);
-            if (user != null && user.verifyPassword(password)) {
-                return user;
-            }
-
-            if (!isUsernameValid(username)) {
-                throw new AuthenticationException("Invalid username");
-            } else if (!isPasswordValid(username, password)) {
-                throw new AuthenticationException("Invalid password");
+            if (isPasswordValid(username, password, users)) {
+                return users.get(username);
             } else {
-                throw new AuthenticationException("Invalid username and password");
+                throw new AuthenticationException("Invalid password");
             }
         } catch (NullPointerException e) {
             // Log the exception or perform any necessary error handling
@@ -114,10 +114,6 @@ public class AuthenticationService {
 
         public NullValueException(String message) {
             super(message);
-        }
-
-        public NullValueException(String message, Throwable cause) {
-            super(message, cause);
         }
     }
 }
