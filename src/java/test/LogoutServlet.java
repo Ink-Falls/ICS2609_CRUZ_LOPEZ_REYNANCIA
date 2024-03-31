@@ -9,31 +9,30 @@ import javax.servlet.http.HttpSession;
 
 public class LogoutServlet extends HttpServlet {
 
-    private static final String REDIRECT_URL = "/index.jsp";
+    private static final String REDIRECT_URL = "index.jsp";
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        invalidateSession(request);
-        redirectToIndex(response);
+        handleRequest(request, response);
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (!invalidateSession(request)) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid session");
-            return;
-        }
         response.setHeader("Cache-Control", "no-store");
+        handleRequest(request, response);
+    }
+
+    private void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        invalidateSession(request);
         redirectToIndex(response);
     }
 
-    private boolean invalidateSession(HttpServletRequest request) {
+    private void invalidateSession(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate();
-            return true;
+        if (session == null) {
+            throw new IllegalStateException("Session is null");
         }
-        return false;
+        session.invalidate();
     }
 
     private void redirectToIndex(HttpServletResponse response) throws IOException {
