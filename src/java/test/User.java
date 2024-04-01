@@ -26,8 +26,3 @@ class User {
         return password;
     }
 }
-
-enum Role {
-    Admin,
-    Guest
-}

@@ -26,7 +26,7 @@ public class AuthenticationService {
     }
 
     public User authenticate(String username, String password) throws NullValueException, AuthenticationException {
-        if (username == null || password == null || username.isEmpty() || password.isEmpty()) {
+        if (username == null || password == null || username.isEmpty()) {
             throw new NullValueException("Username and password must not be null");
         }
 
@@ -36,16 +36,17 @@ public class AuthenticationService {
             }
 
             if (!isUsernameValid(username)) {
-                if (!isPasswordValid(username, password)) {
+                if (password.isEmpty()) {
+                    throw new AuthenticationException("Invalid username");
+                } else {
                     throw new AuthenticationException("Invalid username and password");
                 }
-                throw new AuthenticationException("Invalid username");
-            }
-
-            if (isPasswordValid(username, password)) {
-                return users.get(username);
             } else {
-                throw new AuthenticationException("Invalid password");
+                if (isPasswordValid(username, password)) {
+                    return users.get(username);
+                } else {
+                    throw new AuthenticationException("Invalid password");
+                }
             }
         } catch (NullPointerException e) {
             // Log the exception or perform any necessary error handling
