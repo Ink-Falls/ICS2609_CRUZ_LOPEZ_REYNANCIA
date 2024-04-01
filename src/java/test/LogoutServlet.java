@@ -13,6 +13,7 @@ public class LogoutServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setHeader("Cache-Control", "no-store");
         handleRequest(request, response);
     }
 
@@ -22,12 +23,12 @@ public class LogoutServlet extends HttpServlet {
         handleRequest(request, response);
     }
 
-    private void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         invalidateSession(request);
         redirectToIndex(response);
     }
 
-    private void invalidateSession(HttpServletRequest request) {
+    protected void invalidateSession(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session == null) {
             throw new IllegalStateException("Session is null");
@@ -35,7 +36,7 @@ public class LogoutServlet extends HttpServlet {
         session.invalidate();
     }
 
-    private void redirectToIndex(HttpServletResponse response) throws IOException {
+    protected void redirectToIndex(HttpServletResponse response) throws IOException {
         response.sendRedirect(REDIRECT_URL);
     }
 }
