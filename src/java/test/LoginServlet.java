@@ -35,7 +35,7 @@ public class LoginServlet extends HttpServlet {
             // Initialize AuthenticationService here
             authenticationService = new AuthenticationService(url, dbUsername, dbPassword, servletContext);
 
-//            authenticationService.updateEncryptedPasswords(servletContext);
+            // authenticationService.updateEncryptedPasswords(servletContext);
         } catch (ClassNotFoundException e) {
             throw new ServletException("Failed to load JDBC driver", e);
         }
@@ -53,7 +53,13 @@ public class LoginServlet extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("username", user.getUsername());
                 session.setAttribute("role", user.getRole());
-                response.sendRedirect("success.jsp");
+                String correctCaptcha = (String) session.getAttribute("captcha");
+                String enteredCaptcha = request.getParameter("captcha");
+                if (correctCaptcha != null && correctCaptcha.equalsIgnoreCase(enteredCaptcha)) {
+                    response.sendRedirect("success.jsp");
+                } else {
+                    response.sendRedirect("index.jsp?error=captcha");
+                }
             }
         } catch (AuthenticationService.AuthenticationException e) {
             switch (e.getMessage()) {

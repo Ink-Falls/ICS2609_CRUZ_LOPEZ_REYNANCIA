@@ -3,7 +3,12 @@ package test;
 import java.util.*;
 import java.io.*;
 
-public class CaptchaServlet {
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+
+@WebServlet("/captcha")
+public class CaptchaServlet extends HttpServlet {
 
     // Returns true if given two strings are same
     static boolean checkCaptcha(String captcha, String user_captcha) {
@@ -12,8 +17,7 @@ public class CaptchaServlet {
 
     // Generates a CAPTCHA of given length
     static String generateCaptcha(int n) {
-        // to generate random integers in the range [0-61]
-        Random rand = new Random(62);
+        Random rand = new Random();
 
         // Characters to be included
         String chrs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -22,29 +26,22 @@ public class CaptchaServlet {
         // add these characters to captcha.
         String captcha = "";
         while (n-- > 0) {
-            int index = (int) (Math.random() * 62);
+            int index = rand.nextInt(chrs.length());
             captcha += chrs.charAt(index);
         }
 
         return captcha;
     }
 
-    // Driver code
-    public static void main(String[] args) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // Generate a random CAPTCHA
-        String captcha = generateCaptcha(9);
-        System.out.println(captcha);
-
-        // Ask user to enter a CAPTCHA
-        System.out.println("Enter above CAPTCHA: ");
-        String usr_captcha = reader.readLine();
-
-        // Notify user about matching status
-        if (checkCaptcha(captcha, usr_captcha))
-            System.out.println("CAPTCHA Matched");
-        else
-            System.out.println("CAPTCHA Not Matched");
+        String captcha = generateCaptcha(6);
+        // Store the captcha in the session
+        HttpSession session = req.getSession();
+        session.setAttribute("captcha", captcha);
+        // For simplicity, send the captcha as plain text
+        resp.setContentType("text/plain");
+        resp.getWriter().write(captcha);
     }
 }
