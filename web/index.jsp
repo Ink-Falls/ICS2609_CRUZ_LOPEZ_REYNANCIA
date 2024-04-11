@@ -10,10 +10,10 @@
     </head>
     <body>
         <% response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1. 
-            response.setDateHeader("Expires", 0); //Proxies.
+            response.setDateHeader("Expires", 0); //Proxies. 
             if (session != null && session.getAttribute("username") != null) {
-            session.removeAttribute("username");
-        } %>
+                session.removeAttribute("username");
+            } %>
         <main id="main">
             <header>
                 <span>
@@ -48,19 +48,22 @@
                             placeholder="Password"
                             />
                     </div>
-                    Captcha: <span id="captcha"></span><br />
+                    Captcha: <img id="captcha" alt="CAPTCHA Image" /><br />
                     Enter Captcha: <input type="text" name="captcha" required /><br />
                     <div class="login">
                         <button class="login" type="submit">LOGIN</button>
                     </div>
                 </form>
                 <script>
-                    // Fetch the captcha string from the server and display it
-                    fetch("captcha")
-                            .then((response) => response.text())
-                            .then((data) => {
-                                document.getElementById("captcha").textContent = data;
-                            });
+                    // Display the CAPTCHA image from the server
+                    window.onload = function () {
+                        var captchaImage = document.getElementById("captcha");
+                        captchaImage.src = "captcha";
+                        captchaImage.onerror = function () {
+                            console.error('Failed to load CAPTCHA image from server');
+                            captchaImage.alt = 'Failed to load CAPTCHA';
+                        };
+                    };
                 </script>
             </div>
 
