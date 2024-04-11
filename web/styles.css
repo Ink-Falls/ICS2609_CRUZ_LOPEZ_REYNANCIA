@@ -1,16 +1,28 @@
 /* Global Styles */
+:root {
+    --background-color: #FFFFFF;
+    --header-background-color: #373944;
+    --button-background-color: #1E1E25;
+    --button-hover-background-color: #D3FCCC;
+    --button-active-background-color: #6A8C8C;
+    --carousel-item-color: #1E1E25;
+    --footer-background-color: #1E1E25;
+    --footer-button-background-color: #373944;
+}
+
 body {
     font-family: Tahoma;
-    background: #FFFFFF;
+    background: var(--background-color);
     margin-top: 200px;
     margin-bottom: 7%;
+    white-space: nowrap;
 }
 
 /* Header Styles */
 header {
     width: 100%;
-    height: 60px;
-    background-color: #373944;
+    min-height: 60px;
+    background-color: var(--header-background-color);
     align-items: center;
     position: fixed;
     display: flex;
@@ -21,36 +33,35 @@ header {
 }
 
 header button img {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
     width: 50px;
     margin-left: -55px;
     user-select: none;
 }
 
 header button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    color: #FFFFFF;
-    padding-left: 4.5em;
-    padding-top: 1em;
-    padding-bottom: 1.1em;
-    padding-right: 2em;
-    white-space: nowrap;
+    color: var(--background-color);
+    padding-left: 65px;
+    padding-top: 10px;
+    padding-bottom: 11px;
+    padding-right: 30px;
     height: 100%;
-    background-color: #1E1E25;
-    border-top-right-radius: 100px;
-    border-bottom-right-radius: 100px;
+    background-color: var(--button-background-color);
+    position: relative;
+    border-top-right-radius: 2.5em;
+    border-bottom-right-radius: 2.5em;
     z-index: 1;
     line-height: 1.2;
     user-select: none;
-    font-size: 200%;
+    font-size: 2em;
     font-weight: bold;
     border: none;
 }
 
 header h2 {
-    color: #373944;
+    color: var(--header-background-color);
     position: absolute;
     top: 50%;
     left: 50%;
@@ -65,8 +76,8 @@ button.logout:hover,
 button.error:hover,
 header button:hover,
 footer button:hover {
-    background-color: #D3FCCC;
-    color: #1E1E25;
+    background-color: var(--button-hover-background-color);
+    color: var(--button-background-color);
 }
 
 button.login:active,
@@ -74,8 +85,8 @@ button.logout:active,
 button.error:active,
 header button:active,
 footer button:active {
-    background-color: #6A8C8C;
-    color: #1E1E25;
+    background-color: var(--button-active-background-color);
+    color: var(--button-background-color);
     transition: background-color 0.01s ease-in-out, color 0.01s ease-in-out;
 }
 
@@ -109,9 +120,9 @@ header h2 {
 .carousel-item {
     padding: 20px;
     text-align: center;
-    color: #1E1E25;
+    color: var(--carousel-item-color);
     white-space: nowrap;
-    margin-top: -5px;
+    align-items: flex-start;
     user-select: none;
 }
 
@@ -119,7 +130,7 @@ header h2 {
 footer {
     width: 100%;
     height: 7%;
-    background: #1E1E25;
+    background: var(--footer-background-color);
     align-items: center;
     position: fixed;
     display: flex;
@@ -137,7 +148,7 @@ footer button {
     color: #FFFFFF;
     max-height: 80px;
     font-size: 100%;
-    background-color: #373944;
+    background-color: var(--footer-button-background-color);
     border-radius: 100px;
     padding: 15px;
     width: 100px;
@@ -174,7 +185,7 @@ div.error img {
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #373944;
+    color: var(--header-background-color);
     user-select: none;
     margin-top: 20px;
     font-size: 1.2em;
@@ -182,7 +193,7 @@ div.error img {
     margin-right:auto;
     border-radius: 100px;
     padding: 0.8em 1.6em;
-    border: 2px solid #373944;
+    border: 2px solid var(--header-background-color);
     width: 180px;
     height: 20px;
     margin: 20px auto;
@@ -192,14 +203,14 @@ div.error img {
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #373944;
+    color: var(--header-background-color);
     user-select: none;
     font-size: 1.2em;
     margin-left: auto;
     margin-right:auto;
     border-radius: 100px;
     padding: 0.8em 1.6em;
-    border: 2px solid #373944;
+    border: 2px solid var(--header-background-color);
     width: 180px;
     height: 20px;
     margin: 20px auto;
@@ -211,7 +222,7 @@ h1.error {
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #373944;
+    color: var(--header-background-color);
     user-select: none;
     font-size: 3em;
     margin-top: -5px;
@@ -221,7 +232,7 @@ h2.error {
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #373944;
+    color: var(--header-background-color);
     user-select: none;
     font-size: 2em;
     margin-top: -20px;
@@ -231,7 +242,7 @@ h2.logout {
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #373944;
+    color: var(--header-background-color);
     user-select: none;
     font-size: 2em;
     margin-top: -20px;
@@ -248,7 +259,7 @@ button.login {
     text-align: center;
     color: #FFFFFF;
     font-size: 1em;
-    background-color: #373944;
+    background-color: var(--button-background-color);
     border-radius: 100px;
     padding: 1em 2em;
     width: 250px;
@@ -264,7 +275,7 @@ button.error {
     text-align: center;
     color: #FFFFFF;
     font-size: 1em;
-    background-color: #373944;
+    background-color: var(--button-background-color);
     border-radius: 100px;
     padding: 1em 2em;
     width: 250px;
@@ -287,13 +298,13 @@ button.error {
     }
 
     .carousel-item:hover {
-        color: #D3FCCC;
+        color: var(--button-hover-background-color);
     }
 }
 
 @media (min-width: 1280px) {
     header h2:hover {
-        color: #D3FCCC;
+        color: var(--button-hover-background-color);
     }
 }
 
