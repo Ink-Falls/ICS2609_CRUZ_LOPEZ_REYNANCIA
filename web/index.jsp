@@ -177,6 +177,7 @@
 
             div.login img {
                 max-width: 300px;
+                margin-top: -80px;
             }
 
             .form-container {
@@ -219,6 +220,38 @@
                 height: 20px;
                 margin: 20px auto;
                 margin-top: -5px;
+            }
+
+            .captcha input {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: #373944;
+                user-select: none;
+                font-size: 1.2em;
+                margin-left: auto;
+                margin-right:auto;
+                border-radius: 100px;
+                padding: 0.8em 1.6em;
+                border: 2px solid #373944;
+                width: 180px;
+                height: 20px;
+                margin: 20px auto;
+                margin-top: -5px;
+            }
+
+            .captcha img {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-left: auto;
+                margin-right:auto;
+                width: 180px;
+                height: 40px;
+                margin: 20px auto;
+                margin-top: -25px;
+                -webkit-user-drag: none;
+                pointer-events: none;
             }
 
             .body {
@@ -292,8 +325,10 @@
                             placeholder="Password"
                             />
                     </div>
-                    Captcha: <img id="captcha" alt="CAPTCHA Image" /><br />
-                    Enter Captcha: <input type="text" name="captcha" required /><br />
+                    <div class="captcha">
+                        <input type="text" name="captcha" placeholder="Captcha" required /><br />
+                        <img id="captcha" alt="CAPTCHA Image" /><br />
+                    </div>
                     <div class="login">
                         <button class="login" type="submit">LOGIN</button>
                     </div>
