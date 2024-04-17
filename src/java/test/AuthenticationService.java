@@ -20,6 +20,43 @@ public class AuthenticationService {
         this.servletContext = servletContext;
     }
 
+    public void encryptExistingPasswords() {
+        try (Connection con = DriverManager.getConnection(url, dbUsername, dbPassword)) {
+            // Start transaction
+            con.setAutoCommit(false);
+
+            String selectQuery = "SELECT username, password FROM USER_INFO";
+            String updateQuery = "UPDATE USER_INFO SET password = ? WHERE username = ?";
+
+            try (PreparedStatement selectStmt = con.prepareStatement(selectQuery);
+                    ResultSet rs = selectStmt.executeQuery();
+                    PreparedStatement updateStmt = con.prepareStatement(updateQuery)) {
+
+                while (rs.next()) {
+                    String username = rs.getString("username");
+                    String plaintextPassword = rs.getString("password");
+
+                    if (plaintextPassword != null) {
+                        String key = servletContext.getInitParameter("ENCRYPTION_KEY");
+                        String encryptedPassword = Security.encrypt(plaintextPassword.trim(), key);
+
+                        updateStmt.setString(1, encryptedPassword);
+                        updateStmt.setString(2, username);
+                        updateStmt.executeUpdate();
+                    }
+                }
+                // Commit transaction
+                con.commit();
+            } catch (Exception e) {
+                // Rollback transaction in case of error
+                con.rollback();
+                System.out.println("Failed to encrypt and update passwords: " + e.getMessage());
+            }
+        } catch (SQLException e) {
+            System.out.println("Database connection error during password encryption: " + e.getMessage());
+        }
+    }
+
     private boolean isPasswordValid(String username, String password) {
         User user = users.get(username);
         return user != null && user.getPassword().equals(password);
