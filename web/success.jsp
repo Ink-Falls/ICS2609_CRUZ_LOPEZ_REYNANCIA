@@ -258,8 +258,8 @@
                     <img src="https://i.imgur.com/vokvwP8.png" alt="Login Image" />
                 </div>
 
-                <h1 class="logout">Welcome <%= username%>!</h1>
-                <h2 class="logout">You are logged in as <%= role%>.</h2>
+                <h1 class="logout">Welcome: <%= username%>!</h1>
+                <h2 class="logout">You are logged in as: <%= role%>.</h2>
 
                 <div class="logout">
                     <form action="LogoutServlet" method="POST">
