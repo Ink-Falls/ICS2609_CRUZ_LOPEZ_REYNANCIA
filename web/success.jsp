@@ -259,7 +259,7 @@
                 </div>
 
                 <h1 class="logout">WELCOME: <%= username%>!</h1>
-                <h2 class="logout">You are logged in as: <%= role%>.</h2>
+                <h2 class="logout">YOU are logged in as: <%= role%>.</h2>
 
                 <div class="logout">
                     <form action="LogoutServlet" method="POST">
